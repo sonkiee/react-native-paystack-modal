@@ -1,5 +1,11 @@
 # react-native-paystack-modal
 
+![npm](https://img.shields.io/npm/v/react-native-paystack-modal)
+![downloads](https://img.shields.io/npm/dm/react-native-paystack-modal)
+![license](https://img.shields.io/npm/l/react-native-paystack-modal)
+![typescript](https://img.shields.io/badge/typescript-supported-blue)
+![expo](https://img.shields.io/badge/expo-compatible-black)
+
 A lightweight Paystack checkout SDK for **React Native and Expo** that opens the Paystack payment interface inside a **WebView popup modal**.
 
 The library is **fully type-safe**, requires **no provider setup**, and works in both **Expo and bare React Native apps**.

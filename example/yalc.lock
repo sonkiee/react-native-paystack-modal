@@ -1,0 +1,10 @@
+{
+  "version": "v1",
+  "packages": {
+    "react-native-paystack": {
+      "signature": "937397a276b9977004ba35e43f8aeb1f",
+      "file": true,
+      "replaced": "file:.."
+    }
+  }
+}

@@ -1,12 +1,12 @@
 import { Text, View, StyleSheet, Button } from "react-native";
 
-import { Paystack, PaystackModalHost } from "react-native-paystack";
+import { Paystack, PaystackModalHost } from "react-native-paystack-modal";
 
 export default function Index() {
   const pay = () => {
     const result = Paystack.newTransaction({
-      key: "pk_test_933c69k902008",
-      amount: 100000,
+      key: "pk_test_933c6084322010d16586441406fddb3eef0f93b7",
+      amount: 1000 * 100, // amount in kobo
       email: "user@example.com",
 
       onCancel: () => console.log("Payment cancelled"),
@@ -19,7 +19,7 @@ export default function Index() {
     <View style={styles.container}>
       <Text>Edit src/app/index.tsx to edit this screen.</Text>
 
-      <Button title="Checkout" onPress={() => pay()} />
+      <Button title="Paystack Checkout" onPress={() => pay()} />
       <PaystackModalHost />
     </View>
   );

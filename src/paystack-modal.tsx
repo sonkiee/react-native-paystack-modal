@@ -34,12 +34,11 @@ export default function PayStackModalHost() {
   if (!config) return null; // prevents WebView from rendering before config
 
   return (
-    <Modal visible={visible} animationType="slide">
+    <Modal visible={visible}>
       <WebView
         originWhitelist={["*"]}
         source={{ html: generateHTML(config) }}
         onMessage={(event) => {
-          if (!resolver) return; // guard
           const data = JSON.parse(event.nativeEvent.data);
 
           if (data.type === "success") {
@@ -56,8 +55,8 @@ export default function PayStackModalHost() {
 
           if (data.type === "error") {
             resolver?.reject(data.data);
-            setConfig(null);
           }
+
           if (data.type === "load") {
             config.onLoad?.();
           }

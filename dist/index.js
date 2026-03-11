@@ -258,32 +258,30 @@ function PayStackModalHost() {
     });
   }, []);
   if (!config) return null;
-  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_react_native.Modal, { visible, animationType: "slide", children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_react_native.Modal, { visible, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
     WebView,
     {
       originWhitelist: ["*"],
       source: { html: generateHTML(config) },
       onMessage: (event) => {
-        var _a, _b, _c, _d;
+        var _a;
         const data = JSON.parse(event.nativeEvent.data);
         if (data.type === "success") {
           resolver == null ? void 0 : resolver.resolve(data.data);
-          (_a = config.onSuccess) == null ? void 0 : _a.call(config, data.data);
           setVisible(false);
           setConfig(null);
         }
         if (data.type === "cancel") {
-          resolver == null ? void 0 : resolver.reject();
-          (_b = config.onCancel) == null ? void 0 : _b.call(config);
+          resolver == null ? void 0 : resolver.reject("Payment cancelled");
           setVisible(false);
           setConfig(null);
         }
         if (data.type === "error") {
           resolver == null ? void 0 : resolver.reject(data.data);
-          (_c = config.onError) == null ? void 0 : _c.call(config, data.data);
-          setConfig(null);
         }
-        if (data.type === "load") (_d = config.onLoad) == null ? void 0 : _d.call(config);
+        if (data.type === "load") {
+          (_a = config.onLoad) == null ? void 0 : _a.call(config);
+        }
       }
     }
   ) });

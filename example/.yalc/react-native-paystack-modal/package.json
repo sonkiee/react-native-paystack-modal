@@ -22,8 +22,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "clean": "rm -rf dist",
-    "prepare": "npm run build"
+    "clean": "rm -rf dist"
   },
   "keywords": [
     "react-native",
@@ -51,10 +50,6 @@
   "publishConfig": {
     "access": "public"
   },
-  "devDependencies": {
-    "@types/react": "^19.2.14",
-    "tsup": "^8.5.1",
-    "typescript": "^5.9.3"
-  },
-  "dependencies": {}
+  "dependencies": {},
+  "yalcSig": "8802d87bc041dbd0e5952f2ee6b401da"
 }

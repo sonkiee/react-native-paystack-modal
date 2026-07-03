@@ -27,7 +27,7 @@ export interface Paystack {
   customerCode?: string;
 
   /** Channels to accept payment from (card, bank, ussd, qr, etc.) */
-  channel?: string[];
+  channels?: string[];
 
   /** Optional metadata to attach to transaction */
   metadata?: Record<string, any>;
@@ -47,7 +47,7 @@ export interface Paystack {
 
   // --- Multi-Split Transaction Props ---
   /** Split code for dynamically sharing a single transaction with multiple partners */
-  splitCode?: string;
+  split_code?: string;
 
   // --- Resume Transaction Props ---
   /** Access code returned from server-side transaction initialization */

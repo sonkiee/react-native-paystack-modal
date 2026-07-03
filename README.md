@@ -41,7 +41,7 @@ npm install react-native-paystack-modal
 Install WebView if not already installed:
 
 ```bash
-expo install react-native-webview
+npx expo install react-native-webview
 ```
 
 or
@@ -117,6 +117,28 @@ try {
 
 ---
 
+# Resuming a Transaction
+
+To resume a transaction initialized from your server using an `access_code`:
+
+```ts
+import { Paystack } from "react-native-paystack-modal";
+
+Paystack.resumeTransaction("access_code_from_server", {
+  onSuccess: (response) => {
+    console.log("Payment resumed and completed successfully", response);
+  },
+  onCancel: () => {
+    console.log("Resumed payment cancelled by user");
+  },
+  onError: (error) => {
+    console.error("Resumed payment error", error);
+  }
+});
+```
+
+---
+
 # Supported Methods
 
 | Method | Description |
@@ -160,4 +182,3 @@ This approach allows the SDK to:
 # License
 
 MIT
-# react-native-paystack-modal

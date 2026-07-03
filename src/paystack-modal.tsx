@@ -21,20 +21,45 @@ export default function PayStackModalHost() {
     reject: (error?: any) => void;
   } | null>(null);
 
+  const cleanupTimeoutRef = React.useRef<any>(null);
+
   useEffect(() => {
     registerModal((cfg: Paystack) => {
+      if (cleanupTimeoutRef.current) {
+        clearTimeout(cleanupTimeoutRef.current);
+      }
       return new Promise((resolve, reject) => {
         setConfig(cfg);
         setResolver({ resolve, reject });
         setVisible(true);
       });
     });
+
+    return () => {
+      if (cleanupTimeoutRef.current) {
+        clearTimeout(cleanupTimeoutRef.current);
+      }
+    };
   }, []);
+
+  const closeAndClean = (action?: () => void) => {
+    action?.();
+    setVisible(false);
+    cleanupTimeoutRef.current = setTimeout(() => {
+      setConfig(null);
+      setResolver(null);
+    }, 500);
+  };
 
   if (!config) return null; // prevents WebView from rendering before config
 
   return (
-    <Modal visible={visible}>
+    <Modal
+      visible={visible}
+      onRequestClose={() => {
+        closeAndClean(() => resolver?.reject("Payment cancelled"));
+      }}
+    >
       <WebView
         originWhitelist={["*"]}
         source={{ html: generateHTML(config) }}
@@ -42,19 +67,15 @@ export default function PayStackModalHost() {
           const data = JSON.parse(event.nativeEvent.data);
 
           if (data.type === "success") {
-            resolver?.resolve(data.data);
-            setVisible(false);
-            setConfig(null);
+            closeAndClean(() => resolver?.resolve(data.data));
           }
 
           if (data.type === "cancel") {
-            resolver?.reject("Payment cancelled");
-            setVisible(false);
-            setConfig(null);
+            closeAndClean(() => resolver?.reject("Payment cancelled"));
           }
 
           if (data.type === "error") {
-            resolver?.reject(data.data);
+            closeAndClean(() => resolver?.reject(data.data));
           }
 
           if (data.type === "load") {

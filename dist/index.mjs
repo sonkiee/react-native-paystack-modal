@@ -33,8 +33,7 @@ var Paystack = class {
       if (error === "Payment cancelled") (_a = config.onCancel) == null ? void 0 : _a.call(config);
       else (_b = config.onError) == null ? void 0 : _b.call(config, error);
     });
-    return promise.catch(() => {
-    });
+    return promise;
   }
   /**
    * Synchronous new transaction
@@ -50,8 +49,7 @@ var Paystack = class {
       if (error === "Payment cancelled") (_a = config.onCancel) == null ? void 0 : _a.call(config);
       else (_b = config.onError) == null ? void 0 : _b.call(config, error);
     });
-    return promise.catch(() => {
-    });
+    return promise;
   }
   /**
    * Resume a server-initialized transaction using access code
@@ -72,8 +70,7 @@ var Paystack = class {
       if (error === "Payment cancelled") (_a = callbacks == null ? void 0 : callbacks.onCancel) == null ? void 0 : _a.call(callbacks);
       else (_b = callbacks == null ? void 0 : callbacks.onError) == null ? void 0 : _b.call(callbacks, error);
     });
-    return promise.catch(() => {
-    });
+    return promise;
   }
   /**
    * Preload a transaction for instant modal display
@@ -88,8 +85,7 @@ var Paystack = class {
       if (error === "Payment cancelled") (_a = config.onCancel) == null ? void 0 : _a.call(config);
       else (_b = config.onError) == null ? void 0 : _b.call(config, error);
     });
-    return promise.catch(() => {
-    });
+    return promise;
   }
   /**
    * Cancel a transaction
@@ -110,8 +106,7 @@ var Paystack = class {
       if (error === "Payment cancelled") (_a = config.onCancel) == null ? void 0 : _a.call(config);
       else (_b = config.onError) == null ? void 0 : _b.call(config, error);
     });
-    return promise.catch(() => {
-    });
+    return promise;
   }
 };
 
@@ -218,43 +213,65 @@ function PayStackModalHost() {
   const [visible, setVisible] = React.useState(false);
   const [config, setConfig] = React.useState(null);
   const [resolver, setResolver] = React.useState(null);
+  const cleanupTimeoutRef = React.useRef(null);
   useEffect(() => {
     registerModal((cfg) => {
+      if (cleanupTimeoutRef.current) {
+        clearTimeout(cleanupTimeoutRef.current);
+      }
       return new Promise((resolve, reject) => {
         setConfig(cfg);
         setResolver({ resolve, reject });
         setVisible(true);
       });
     });
-  }, []);
-  if (!config) return null;
-  return /* @__PURE__ */ jsx(Modal, { visible, children: /* @__PURE__ */ jsx(
-    WebView,
-    {
-      originWhitelist: ["*"],
-      source: { html: generateHTML(config) },
-      onMessage: (event) => {
-        var _a;
-        const data = JSON.parse(event.nativeEvent.data);
-        if (data.type === "success") {
-          resolver == null ? void 0 : resolver.resolve(data.data);
-          setVisible(false);
-          setConfig(null);
-        }
-        if (data.type === "cancel") {
-          resolver == null ? void 0 : resolver.reject("Payment cancelled");
-          setVisible(false);
-          setConfig(null);
-        }
-        if (data.type === "error") {
-          resolver == null ? void 0 : resolver.reject(data.data);
-        }
-        if (data.type === "load") {
-          (_a = config.onLoad) == null ? void 0 : _a.call(config);
-        }
+    return () => {
+      if (cleanupTimeoutRef.current) {
+        clearTimeout(cleanupTimeoutRef.current);
       }
+    };
+  }, []);
+  const closeAndClean = (action) => {
+    action == null ? void 0 : action();
+    setVisible(false);
+    cleanupTimeoutRef.current = setTimeout(() => {
+      setConfig(null);
+      setResolver(null);
+    }, 500);
+  };
+  if (!config) return null;
+  return /* @__PURE__ */ jsx(
+    Modal,
+    {
+      visible,
+      onRequestClose: () => {
+        closeAndClean(() => resolver == null ? void 0 : resolver.reject("Payment cancelled"));
+      },
+      children: /* @__PURE__ */ jsx(
+        WebView,
+        {
+          originWhitelist: ["*"],
+          source: { html: generateHTML(config) },
+          onMessage: (event) => {
+            var _a;
+            const data = JSON.parse(event.nativeEvent.data);
+            if (data.type === "success") {
+              closeAndClean(() => resolver == null ? void 0 : resolver.resolve(data.data));
+            }
+            if (data.type === "cancel") {
+              closeAndClean(() => resolver == null ? void 0 : resolver.reject("Payment cancelled"));
+            }
+            if (data.type === "error") {
+              closeAndClean(() => resolver == null ? void 0 : resolver.reject(data.data));
+            }
+            if (data.type === "load") {
+              (_a = config.onLoad) == null ? void 0 : _a.call(config);
+            }
+          }
+        }
+      )
     }
-  ) });
+  );
 }
 export {
   Paystack,

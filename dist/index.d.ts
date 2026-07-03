@@ -21,7 +21,7 @@ interface Paystack$1 {
     /** Optional customer code for integration with Paystack customer system */
     customerCode?: string;
     /** Channels to accept payment from (card, bank, ussd, qr, etc.) */
-    channel?: string[];
+    channels?: string[];
     /** Optional metadata to attach to transaction */
     metadata?: Record<string, any>;
     /** Reference for the transaction (auto-generated if not provided) */
@@ -33,7 +33,7 @@ interface Paystack$1 {
     /** A flat fee the main account should take */
     transactionCharge?: number;
     /** Split code for dynamically sharing a single transaction with multiple partners */
-    splitCode?: string;
+    split_code?: string;
     /** Access code returned from server-side transaction initialization */
     accessCode?: string;
     /** Called when the modal loads successfully */

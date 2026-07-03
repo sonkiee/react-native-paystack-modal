@@ -135,7 +135,7 @@ See the official Paystack InlineJS documentation:
 
 ---
 
-```markdown
+
 ## How It Works
 
 This library loads **Paystack InlineJS** inside a **React Native WebView** and presents it as a **modal popup**.

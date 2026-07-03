@@ -20,7 +20,7 @@ export default class Paystack {
         else config.onError?.(error);
       });
 
-    return promise.catch(() => {}); // prevent unhandled promise rejection if caller doesn't handle it
+    return promise;
   }
 
   /**
@@ -38,7 +38,7 @@ export default class Paystack {
       });
 
     // Return the promise for optional async/await usage
-    return promise.catch(() => {}); // prevent unhandled promise rejection if caller doesn't handle it
+    return promise;
   }
 
   /**
@@ -65,7 +65,7 @@ export default class Paystack {
         else callbacks?.onError?.(error);
       });
 
-    return promise.catch(() => {}); // prevent unhandled promise rejection if caller doesn't handle it
+    return promise;
   }
 
   /**
@@ -81,7 +81,7 @@ export default class Paystack {
         else config.onError?.(error);
       });
 
-    return promise.catch(() => {});
+    return promise;
   }
 
   /**
@@ -109,6 +109,6 @@ export default class Paystack {
         if (error === "Payment cancelled") config.onCancel?.();
         else config.onError?.(error);
       });
-    return promise.catch(() => {}); // prevent unhandled promise rejection if caller doesn't handle it
+    return promise;
   }
 }

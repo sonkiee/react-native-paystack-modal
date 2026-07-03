@@ -2,7 +2,7 @@
   "version": "v1",
   "packages": {
     "react-native-paystack-modal": {
-      "signature": "8802d87bc041dbd0e5952f2ee6b401da",
+      "signature": "79e30cd1ca079c81cdd9e25731be8264",
       "file": true
     }
   }

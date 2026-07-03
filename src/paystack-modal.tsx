@@ -1,6 +1,13 @@
 import React, { useEffect } from "react";
 import { registerModal } from "./modal-controller";
-import { Modal } from "react-native";
+import {
+  Modal,
+  SafeAreaView,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
 import { WebView } from "react-native-webview";
 import { generateHTML } from "./html-template";
 import { Paystack } from "./types";
@@ -13,68 +20,87 @@ export default function PayStackModalHost() {
     reject: (error?: any) => void;
   } | null>(null);
 
-  const cleanupTimeoutRef = React.useRef<any>(null);
-
   useEffect(() => {
     registerModal((cfg: Paystack) => {
-      if (cleanupTimeoutRef.current) {
-        clearTimeout(cleanupTimeoutRef.current);
-      }
       return new Promise((resolve, reject) => {
         setConfig(cfg);
         setResolver({ resolve, reject });
         setVisible(true);
       });
     });
-
-    return () => {
-      if (cleanupTimeoutRef.current) {
-        clearTimeout(cleanupTimeoutRef.current);
-      }
-    };
   }, []);
 
   const closeAndClean = (action?: () => void) => {
     action?.();
     setVisible(false);
-    cleanupTimeoutRef.current = setTimeout(() => {
-      setConfig(null);
-      setResolver(null);
-    }, 500);
+    setConfig(null);
+    setResolver(null);
   };
 
-  if (!config) return null; // prevents WebView from rendering before config
+  if (!visible || !config) return null;
 
   return (
     <Modal
       visible={visible}
+      animationType="slide"
       onRequestClose={() => {
         closeAndClean(() => resolver?.reject("Payment cancelled"));
       }}
     >
-      <WebView
-        originWhitelist={["*"]}
-        source={{ html: generateHTML(config) }}
-        onMessage={(event) => {
-          const data = JSON.parse(event.nativeEvent.data);
+      <SafeAreaView style={styles.container}>
+        <WebView
+          originWhitelist={["*"]}
+          source={{ html: generateHTML(config) }}
+          onMessage={(event) => {
+            const data = JSON.parse(event.nativeEvent.data);
 
-          if (data.type === "success") {
-            closeAndClean(() => resolver?.resolve(data.data));
-          }
+            if (data.type === "success") {
+              closeAndClean(() => resolver?.resolve(data.data));
+            }
 
-          if (data.type === "cancel") {
-            closeAndClean(() => resolver?.reject("Payment cancelled"));
-          }
+            if (data.type === "cancel") {
+              closeAndClean(() => resolver?.reject("Payment cancelled"));
+            }
 
-          if (data.type === "error") {
-            closeAndClean(() => resolver?.reject(data.data));
-          }
+            if (data.type === "error") {
+              closeAndClean(() => resolver?.reject(data.data));
+            }
 
-          if (data.type === "load") {
-            config.onLoad?.();
-          }
-        }}
-      />
+            if (data.type === "load") {
+              config.onLoad?.();
+            }
+          }}
+        />
+      </SafeAreaView>
     </Modal>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+  },
+  header: {
+    height: 50,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+    paddingHorizontal: 16,
+  },
+  closeButton: {
+    paddingVertical: 8,
+  },
+  closeButtonText: {
+    fontSize: 16,
+    color: "#333333",
+    fontWeight: "500",
+  },
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#000000",
+  },
+});

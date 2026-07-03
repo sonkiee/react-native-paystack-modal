@@ -46,6 +46,7 @@ export function generateHTML(config: Paystack) {
         cfg.currency = cfg.currency || "NGN";
         cfg.reference = cfg.reference || Math.floor(Math.random() * 1000000000 + 1).toString();
 
+        const popup = new PaystackPop();
         let handler;
 
         switch (cfg.flow) {
@@ -54,28 +55,28 @@ export function generateHTML(config: Paystack) {
               callbacks.onError("accessCode is required for resumeTransaction");
               return;
             }
-            handler = PaystackPop.resumeTransaction(cfg.accessCode, callbacks);
+            handler = popup.resumeTransaction(cfg.accessCode, callbacks);
             break;
 
           case "newTransaction":
-            handler = PaystackPop.setup(Object.assign({}, cfg, callbacks));
+            handler = popup.newTransaction(Object.assign({}, cfg, callbacks));
             break;
 
           case "preloadTransaction":
-            handler = PaystackPop.preloadTransaction(Object.assign({}, cfg, callbacks));
+            handler = popup.preloadTransaction(Object.assign({}, cfg, callbacks));
             break;
 
           case "cancelTransaction":
-            handler = PaystackPop.cancelTransaction(cfg.reference);
+            handler = popup.cancelTransaction(cfg.reference);
             break;
 
           case "paymentRequest":
-            handler = PaystackPop.paymentRequest(Object.assign({}, cfg, callbacks));
+            handler = popup.paymentRequest(Object.assign({}, cfg, callbacks));
             break;
 
           case "checkout":
           default:
-            handler = PaystackPop.setup(Object.assign({}, cfg, callbacks));
+            handler = popup.newTransaction(Object.assign({}, cfg, callbacks));
         }
 
         // Open the modal if available

@@ -188,6 +188,7 @@ function generateHTML(config) {
         cfg.currency = cfg.currency || "NGN";
         cfg.reference = cfg.reference || Math.floor(Math.random() * 1000000000 + 1).toString();
 
+        const popup = new PaystackPop();
         let handler;
 
         switch (cfg.flow) {
@@ -196,28 +197,28 @@ function generateHTML(config) {
               callbacks.onError("accessCode is required for resumeTransaction");
               return;
             }
-            handler = PaystackPop.resumeTransaction(cfg.accessCode, callbacks);
+            handler = popup.resumeTransaction(cfg.accessCode, callbacks);
             break;
 
           case "newTransaction":
-            handler = PaystackPop.setup(Object.assign({}, cfg, callbacks));
+            handler = popup.newTransaction(Object.assign({}, cfg, callbacks));
             break;
 
           case "preloadTransaction":
-            handler = PaystackPop.preloadTransaction(Object.assign({}, cfg, callbacks));
+            handler = popup.preloadTransaction(Object.assign({}, cfg, callbacks));
             break;
 
           case "cancelTransaction":
-            handler = PaystackPop.cancelTransaction(cfg.reference);
+            handler = popup.cancelTransaction(cfg.reference);
             break;
 
           case "paymentRequest":
-            handler = PaystackPop.paymentRequest(Object.assign({}, cfg, callbacks));
+            handler = popup.paymentRequest(Object.assign({}, cfg, callbacks));
             break;
 
           case "checkout":
           default:
-            handler = PaystackPop.setup(Object.assign({}, cfg, callbacks));
+            handler = popup.newTransaction(Object.assign({}, cfg, callbacks));
         }
 
         // Open the modal if available
@@ -236,41 +237,31 @@ function PayStackModalHost() {
   const [visible, setVisible] = import_react.default.useState(false);
   const [config, setConfig] = import_react.default.useState(null);
   const [resolver, setResolver] = import_react.default.useState(null);
-  const cleanupTimeoutRef = import_react.default.useRef(null);
   (0, import_react.useEffect)(() => {
     registerModal((cfg) => {
-      if (cleanupTimeoutRef.current) {
-        clearTimeout(cleanupTimeoutRef.current);
-      }
       return new Promise((resolve, reject) => {
         setConfig(cfg);
         setResolver({ resolve, reject });
         setVisible(true);
       });
     });
-    return () => {
-      if (cleanupTimeoutRef.current) {
-        clearTimeout(cleanupTimeoutRef.current);
-      }
-    };
   }, []);
   const closeAndClean = (action) => {
     action == null ? void 0 : action();
     setVisible(false);
-    cleanupTimeoutRef.current = setTimeout(() => {
-      setConfig(null);
-      setResolver(null);
-    }, 500);
+    setConfig(null);
+    setResolver(null);
   };
-  if (!config) return null;
+  if (!visible || !config) return null;
   return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
     import_react_native.Modal,
     {
       visible,
+      animationType: "slide",
       onRequestClose: () => {
         closeAndClean(() => resolver == null ? void 0 : resolver.reject("Payment cancelled"));
       },
-      children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+      children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_react_native.SafeAreaView, { style: styles.container, children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
         import_react_native_webview.WebView,
         {
           originWhitelist: ["*"],
@@ -292,10 +283,38 @@ function PayStackModalHost() {
             }
           }
         }
-      )
+      ) })
     }
   );
 }
+var styles = import_react_native.StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#ffffff"
+  },
+  header: {
+    height: 50,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+    paddingHorizontal: 16
+  },
+  closeButton: {
+    paddingVertical: 8
+  },
+  closeButtonText: {
+    fontSize: 16,
+    color: "#333333",
+    fontWeight: "500"
+  },
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#000000"
+  }
+});
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   Paystack,

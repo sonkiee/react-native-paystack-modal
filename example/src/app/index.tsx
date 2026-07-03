@@ -1,6 +1,5 @@
 import { Text, View, StyleSheet, Button } from "react-native";
-
-import { Paystack, PaystackModalHost } from "react-native-paystack-modal";
+import { Paystack } from "react-native-paystack-modal";
 
 export default function Index() {
   const pay = () => {
@@ -15,12 +14,21 @@ export default function Index() {
     });
   };
 
+  const resume = () => {
+    Paystack.resumeTransaction("thn9htgfvahhg3m", {
+      onCancel: () => console.log("Resume cancelled"),
+      onError: (error) => console.log("Resume error:", error),
+      onSuccess: (response) => console.log("Resume successful:", response),
+    });
+  };
+
   return (
     <View style={styles.container}>
       <Text>Edit src/app/index.tsx to edit this screen.</Text>
 
       <Button title="Paystack Checkout" onPress={() => pay()} />
-      <PaystackModalHost />
+      <View style={{ height: 12 }} />
+      <Button title="Resume Transaction" onPress={() => resume()} />
     </View>
   );
 }

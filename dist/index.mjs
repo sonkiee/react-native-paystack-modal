@@ -105,7 +105,11 @@ var Paystack = class {
 
 // src/paystack-modal.tsx
 import React, { useEffect } from "react";
-import { Modal } from "react-native";
+import {
+  Modal,
+  SafeAreaView,
+  StyleSheet
+} from "react-native";
 import { WebView } from "react-native-webview";
 
 // src/html-template.ts
@@ -151,6 +155,7 @@ function generateHTML(config) {
         cfg.currency = cfg.currency || "NGN";
         cfg.reference = cfg.reference || Math.floor(Math.random() * 1000000000 + 1).toString();
 
+        const popup = new PaystackPop();
         let handler;
 
         switch (cfg.flow) {
@@ -159,28 +164,28 @@ function generateHTML(config) {
               callbacks.onError("accessCode is required for resumeTransaction");
               return;
             }
-            handler = PaystackPop.resumeTransaction(cfg.accessCode, callbacks);
+            handler = popup.resumeTransaction(cfg.accessCode, callbacks);
             break;
 
           case "newTransaction":
-            handler = PaystackPop.setup(Object.assign({}, cfg, callbacks));
+            handler = popup.newTransaction(Object.assign({}, cfg, callbacks));
             break;
 
           case "preloadTransaction":
-            handler = PaystackPop.preloadTransaction(Object.assign({}, cfg, callbacks));
+            handler = popup.preloadTransaction(Object.assign({}, cfg, callbacks));
             break;
 
           case "cancelTransaction":
-            handler = PaystackPop.cancelTransaction(cfg.reference);
+            handler = popup.cancelTransaction(cfg.reference);
             break;
 
           case "paymentRequest":
-            handler = PaystackPop.paymentRequest(Object.assign({}, cfg, callbacks));
+            handler = popup.paymentRequest(Object.assign({}, cfg, callbacks));
             break;
 
           case "checkout":
           default:
-            handler = PaystackPop.setup(Object.assign({}, cfg, callbacks));
+            handler = popup.newTransaction(Object.assign({}, cfg, callbacks));
         }
 
         // Open the modal if available
@@ -199,41 +204,31 @@ function PayStackModalHost() {
   const [visible, setVisible] = React.useState(false);
   const [config, setConfig] = React.useState(null);
   const [resolver, setResolver] = React.useState(null);
-  const cleanupTimeoutRef = React.useRef(null);
   useEffect(() => {
     registerModal((cfg) => {
-      if (cleanupTimeoutRef.current) {
-        clearTimeout(cleanupTimeoutRef.current);
-      }
       return new Promise((resolve, reject) => {
         setConfig(cfg);
         setResolver({ resolve, reject });
         setVisible(true);
       });
     });
-    return () => {
-      if (cleanupTimeoutRef.current) {
-        clearTimeout(cleanupTimeoutRef.current);
-      }
-    };
   }, []);
   const closeAndClean = (action) => {
     action == null ? void 0 : action();
     setVisible(false);
-    cleanupTimeoutRef.current = setTimeout(() => {
-      setConfig(null);
-      setResolver(null);
-    }, 500);
+    setConfig(null);
+    setResolver(null);
   };
-  if (!config) return null;
+  if (!visible || !config) return null;
   return /* @__PURE__ */ jsx(
     Modal,
     {
       visible,
+      animationType: "slide",
       onRequestClose: () => {
         closeAndClean(() => resolver == null ? void 0 : resolver.reject("Payment cancelled"));
       },
-      children: /* @__PURE__ */ jsx(
+      children: /* @__PURE__ */ jsx(SafeAreaView, { style: styles.container, children: /* @__PURE__ */ jsx(
         WebView,
         {
           originWhitelist: ["*"],
@@ -255,10 +250,38 @@ function PayStackModalHost() {
             }
           }
         }
-      )
+      ) })
     }
   );
 }
+var styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#ffffff"
+  },
+  header: {
+    height: 50,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+    paddingHorizontal: 16
+  },
+  closeButton: {
+    paddingVertical: 8
+  },
+  closeButtonText: {
+    fontSize: 16,
+    color: "#333333",
+    fontWeight: "500"
+  },
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#000000"
+  }
+});
 export {
   Paystack,
   PayStackModalHost as PaystackModalHost

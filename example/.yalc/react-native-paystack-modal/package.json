@@ -1,6 +1,6 @@
 {
   "name": "react-native-paystack-modal",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Paystack payments for React Native and Expo using a WebView popup modal. Fully type-safe with no provider setup required.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -8,8 +8,8 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
     }
   },
   "files": [
@@ -51,6 +51,8 @@
   "publishConfig": {
     "access": "public"
   },
-  "dependencies": {},
-  "yalcSig": "79e30cd1ca079c81cdd9e25731be8264"
+  "dependencies": {
+    "react-native-safe-area-context": "^5.8.0"
+  },
+  "yalcSig": "27f832e5337a2fa8927840c757e2b588"
 }

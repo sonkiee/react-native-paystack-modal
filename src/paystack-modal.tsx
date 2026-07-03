@@ -1,17 +1,9 @@
 import React, { useEffect } from "react";
 import { registerModal } from "./modal-controller";
 import { Modal } from "react-native";
+import { WebView } from "react-native-webview";
 import { generateHTML } from "./html-template";
 import { Paystack } from "./types";
-
-let WebView: typeof import("react-native-webview").WebView;
-try {
-  WebView = require("react-native-webview").WebView;
-} catch (e) {
-  throw new Error(
-    "react-native-webview is required for PaystackModalHost. Please install it using 'npm install react-native-webview' or 'yarn add react-native-webview'",
-  );
-}
 
 export default function PayStackModalHost() {
   const [visible, setVisible] = React.useState(false);

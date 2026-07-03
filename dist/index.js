@@ -143,6 +143,7 @@ var Paystack = class {
 // src/paystack-modal.tsx
 var import_react = __toESM(require("react"));
 var import_react_native = require("react-native");
+var import_react_native_webview = require("react-native-webview");
 
 // src/html-template.ts
 function generateHTML(config) {
@@ -231,14 +232,6 @@ function generateHTML(config) {
 
 // src/paystack-modal.tsx
 var import_jsx_runtime = require("react/jsx-runtime");
-var WebView;
-try {
-  WebView = require("react-native-webview").WebView;
-} catch (e) {
-  throw new Error(
-    "react-native-webview is required for PaystackModalHost. Please install it using 'npm install react-native-webview' or 'yarn add react-native-webview'"
-  );
-}
 function PayStackModalHost() {
   const [visible, setVisible] = import_react.default.useState(false);
   const [config, setConfig] = import_react.default.useState(null);
@@ -278,7 +271,7 @@ function PayStackModalHost() {
         closeAndClean(() => resolver == null ? void 0 : resolver.reject("Payment cancelled"));
       },
       children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-        WebView,
+        import_react_native_webview.WebView,
         {
           originWhitelist: ["*"],
           source: { html: generateHTML(config) },

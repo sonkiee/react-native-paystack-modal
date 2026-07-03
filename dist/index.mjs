@@ -1,10 +1,3 @@
-var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
-  get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
-}) : x)(function(x) {
-  if (typeof require !== "undefined") return require.apply(this, arguments);
-  throw Error('Dynamic require of "' + x + '" is not supported');
-});
-
 // src/modal-controller.ts
 var openModal;
 function registerModal(fn) {
@@ -113,6 +106,7 @@ var Paystack = class {
 // src/paystack-modal.tsx
 import React, { useEffect } from "react";
 import { Modal } from "react-native";
+import { WebView } from "react-native-webview";
 
 // src/html-template.ts
 function generateHTML(config) {
@@ -201,14 +195,6 @@ function generateHTML(config) {
 
 // src/paystack-modal.tsx
 import { jsx } from "react/jsx-runtime";
-var WebView;
-try {
-  WebView = __require("react-native-webview").WebView;
-} catch (e) {
-  throw new Error(
-    "react-native-webview is required for PaystackModalHost. Please install it using 'npm install react-native-webview' or 'yarn add react-native-webview'"
-  );
-}
 function PayStackModalHost() {
   const [visible, setVisible] = React.useState(false);
   const [config, setConfig] = React.useState(null);
